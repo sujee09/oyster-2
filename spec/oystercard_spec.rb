@@ -44,11 +44,18 @@ describe Oystercard do
 
   describe '#touch_out' do
     it 'touches-out the user as the complete their journey' do
-      expect(card).to respond_to(:touch_out)
+      expect(card).to respond_to(:touch_out).with(1).argument
+    end
+
+    it 'stores the exit station' do
+      card.top_up(10)
+      card.touch_in("Putney")
+      card.touch_out("Balham")
+      expect(card.exit_station).to eq("Balham")
     end
 
     it 'deducts the correct fare at the end of the journey' do
-      expect { card.touch_out }.to change { card.balance }.by(-Oystercard::FARE)
+      expect { card.touch_out("Balham") }.to change { card.balance }.by(-Oystercard::FARE)
     end
   end
 

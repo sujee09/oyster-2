@@ -1,5 +1,5 @@
 class Oystercard
-  attr_reader :balance, :entry_station
+  attr_reader :balance, :entry_station, :exit_station, :journey_list
 
   MAX_BALANCE = 90
   DEFAULT_BALANCE = 0
@@ -9,6 +9,8 @@ class Oystercard
   def initialize(balance = DEFAULT_BALANCE)
     @balance = balance
     @in_journey = false
+    @journey_list = []
+    # hash = Hash.new
   end
 
   def top_up(amount)
@@ -26,13 +28,28 @@ class Oystercard
 
     @in_journey = true
     @entry_station = station
+    # hash[:@entry_station] = station
   end
 
-  def touch_out
+  def touch_out(station)
     deduct
     @in_journey = false
     @entry_station = nil
+    @exit_station = station
+    # hash[:@exit_staiton] = station
   end
+
+  # def add_journey
+    # instance_variables.each do |var|
+    #   if var == @entry_station || @exit_station
+    #     hash[var.to_s.delete('@')] = instance_variable_get(var)
+    #   end
+    # end
+    # hash[:@entry_station] = @entry_station
+    # hash[:@exit_staiton] = @exit_station
+  #   @journey_list << hash
+  #
+  # end
 
   private
 
