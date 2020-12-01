@@ -1,7 +1,7 @@
 require 'oystercard'
 
 describe Oystercard do
-  subject(:card) {Oystercard.new}
+  subject(:card) { Oystercard.new }
   it 'balance to be zero' do
     expect(card.balance).to eq(0)
   end
@@ -10,14 +10,12 @@ describe Oystercard do
     expect(card.balance).to eq Oystercard::DEFAULT_BALANCE
   end
 
-  describe '#deduct' do
-    it 'deducts the fare from your card' do
-      expect(card).to respond_to(:deduct).with(1).argument
-
-      expect { card.deduct 4 }.to change { card.balance }.by (-4)
-    end
-
-  end
+  # describe '#deduct' do
+  #   it 'deducts the fare from your card' do
+  #     expect(card).to respond_to(:deduct)
+  #     expect { card.deduct }.to change { card.balance }.by(-Oystercard::FARE)
+  #   end
+  # end
 
   describe '#in_journey' do
     it 'shows whether user in journey' do
@@ -27,18 +25,30 @@ describe Oystercard do
 
   describe '#touch_in' do
     it 'touches-in the user to begin journey' do
-      expect(card).to respond_to(:touch_in)
+      expect(card).to respond_to(:touch_in).with(1).argument
     end
 
     it 'raises an error if balance is less than min. fare' do
       card.top_up(0.5)
-      expect { card.touch_in }.to raise_error "Balance is too low - it's less than £#{Oystercard::MIN_BALANCE} min. fare"
+      expect { card.touch_in("Putney") }.to raise_error "Balance is too low - it's less than £#{Oystercard::MIN_BALANCE} min. fare"
     end
+
+   # let(:station){ double :station }
+    it 'stores station where card was touched in' do
+      card.top_up(10)
+      card.touch_in("Putney")
+      expect(card.entry_station).to eq("Putney")
+    end
+
   end
 
   describe '#touch_out' do
     it 'touches-out the user as the complete their journey' do
       expect(card).to respond_to(:touch_out)
+    end
+
+    it 'deducts the correct fare at the end of the journey' do
+      expect { card.touch_out }.to change { card.balance }.by(-Oystercard::FARE)
     end
   end
 
@@ -49,14 +59,11 @@ describe Oystercard do
 
     it 'raises an error when top up is greater than maximum balance' do
       card.top_up(50)
-      expect{ card.top_up(41) }.to raise_error "£#{Oystercard::MAX_BALANCE} Max. Value Exceeded"
+      expect { card.top_up(41) }.to raise_error "£#{Oystercard::MAX_BALANCE} Max. Value Exceeded"
     end
 
     it 'adds money to the balance' do
-      expect{ card.top_up(5) }.to change{ card.balance }.by 5
+      expect { card.top_up(5) }.to change { card.balance }.by 5
     end
-
   end
-
-
 end
